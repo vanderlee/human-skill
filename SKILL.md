@@ -9,17 +9,19 @@ Make code review after AI changes easier on humans. Produce code and a change ex
 
 For review requests, do not edit files. Lead with actionable findings, their locations, concrete consequences, and suggested remedies. Label demonstrated defects, contract violations, and applicable mandatory-rule violations **Required**; label preferences and readability improvements **Optional**. Use **FYI** only for useful context that requests no change. Prioritize by impact, distinguish pre-existing findings from introduced ones, and do not invent findings to fill a list.
 
+Discuss observable code behavior and consequences without attributing competence or motives. When a missing requirement determines whether something is defective, identify that uncertainty and seek the relevant contract before presenting a required fix. Keep demonstrated defects direct and actionable.
+
 ## Keep communication easy to read
 
 Apply these rules to chatbot conversations, code comments, documentation, review findings, handoffs, and other writing produced for the task. Respect explicit output requirements and established document formats.
 
 - Use as few words as possible while preserving meaning, necessary evidence, and consequential limitations. Remove repetition, filler, and unnecessary background.
 - Use short sentences and familiar words. Prefer plain-language explanations over specialist vocabulary.
-- When a specialist term is needed, briefly explain it in parentheses on first use. For example: "invariant (a rule that must always hold)." Avoid repeating definitions when the reader already has them.
+- Match explanations to the reader's demonstrated knowledge and the task. Explain unfamiliar domain rules, local conventions, and specialist terms; omit basics already established in the conversation. When knowledge is uncertain, lead with the decision and provide supporting detail where needed. A brief parenthetical definition can help: "invariant (a rule that must always hold)."
 - Prefer bullet points for multiple facts, choices, findings, or steps. Keep each bullet focused. Use a short sentence for a single point rather than forcing it into a list.
 - Lead with the answer, outcome, or action. Add only the context needed to understand it or decide what to do next.
 - Keep technical names precise when needed to locate code or describe a contract. Do not shorten text by hiding important conditions, changing meaning, or replacing useful explanations with unexplained jargon.
-- In code documentation, explain non-obvious intent and constraints. Do not add comments merely to restate clear code or define routine syntax.
+- In code documentation, explain non-obvious intent and constraints. When review uncovers an explanation future maintainers will need, preserve it in the appropriate code comment, test, or maintained documentation within scope. Do not leave essential understanding only in the conversation or add comments merely to restate clear code or define routine syntax.
 
 ## Ground changes in the code
 
@@ -118,7 +120,7 @@ Apply these principles when writing the requested change. Refactor existing code
 - Treat attractive code and fluent explanations as presentation, not evidence of correctness. Update obsolete active comments and examples within scope; distinguish completed, cancelled, and pending work.
 - When work spans interruptions or handoffs, retain relevant locations, unresolved assumptions, completed checks, and the next step in existing task context. Do not scatter temporary notes through the repository.
 
-For each consequential change, check whether a reviewer can locate the changed rule, understand its inputs and effects, and find evidence for its behavior. Identify unnecessary navigation, hidden state, or implicit assumptions that obstruct that judgment; resolve task-relevant obstacles within scope.
+For each consequential change, check whether a reviewer can locate the changed rule, predict an observable result for a representative input, understand a relevant boundary or failure case, and find evidence for its behavior. Resolve missing causal links using code and evidence; address task-relevant navigation, hidden state, or implicit assumptions within scope. Apply this during your own review, without requiring a user quiz or a lengthy explanation.
 
 Optional evidence is organized by decision: [references/cognition-evidence.md](references/cognition-evidence.md) covers maintenance choices, and [references/review-cognition.md](references/review-cognition.md) covers review choices. Consult only relevant findings when evaluating or explaining a recommendation. These references add no mandatory checks or cleanup requirements, and their engineering applications are not universal cognitive limits.
 
@@ -142,7 +144,7 @@ When writing or changing tests, use the reviewer's domain vocabulary. Make the t
 
 For structural refactors, verify representative success, failure, and boundary behavior and relevant state/effect timing. Select specialized execution and lifecycle checks from the conditional reference when applicable. Verify that newly used APIs, signatures, configuration keys, and dependencies exist in the project's actual versions rather than accepting plausible generated names. For a small naming or comment edit, proportionate inspection or an existing syntax check may suffice.
 
-Connect important behavior claims to relevant tests or checks. State what was actually run, what the evidence covers, and material assumptions or untested behavior. A passing suite alone is not proof of every behavior-preservation claim. Do not imply that a check, independent review, or CI matrix ran when it did not.
+Make important behavior claims inexpensive to check: link the changed rule to the relevant implementation and tests or checks, and give a concrete input and expected outcome when that clarifies behavior. State what was actually run, distinguish observed results from inferred coverage, and identify material assumptions or untested behavior. A passing suite alone is not proof of every behavior-preservation claim. Do not imply that a check, independent review, or CI matrix ran when it did not.
 
 Before handing over implementation work, check affected code against the refactoring and formatting rules above. Confirm whether the authoritative project formatter/check ran after the final code edits, and report unavailable verification.
 
@@ -151,6 +153,8 @@ Before handing over implementation work, inspect the actual final diff against t
 ## Hand off for human review
 
 Lead with the concrete outcome and explain the reason for the change. For substantial work, provide a short reading route through the entry point, important logic or contract, and relevant tests, using current file/symbol links. Identify the decisions that deserve human attention and map significant structural moves. Base this explanation on the final diff and code, not the abandoned plan or intermediate tool activity.
+
+Describe review scope and risk through concrete behavior and dependencies. Avoid unsupported difficulty labels such as "trivial," "obvious," or "too complex." Explain what deserves attention and why.
 
 When handing work to a reviewer, provide a self-contained brief: the requirements or accepted scope, the final change summary, the relevant contract and evidence, and explicit review boundaries. Use base/head commits when they accurately identify the work; for a dirty working tree, identify the starting snapshot and owned changes instead of pretending a commit range captures them. Provide enough context to assess the artifact without sending the full session history. Independent review is useful when warranted and authorized; it is not mandatory delegation.
 
