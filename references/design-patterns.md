@@ -1,6 +1,26 @@
-# Design patterns and structural review criteria
+# Contracts, OOP, SOLID, and structural review criteria
 
 Apply these rules to the requested structural work and its affected code. Classify by behavior and maintenance consequences, not by names, file length, or a pattern catalog. Follow the user's requirements and the repository's actual contracts.
+
+## Contracts and object boundaries
+
+Make affected contracts explicit through the project's types, interfaces, implementation, tests, and documentation. Establish valid inputs, observable results, failure behavior, state changes, and lifecycle constraints where relevant. Do not duplicate every contract in every form.
+
+Keep objects responsible for protecting their own invariants. Prefer operations that express domain intent over exposing mutable internals and requiring callers to coordinate correctness. Keep dependencies visible and distinguish who owns state from who merely uses it. A contract is behavioral; an interface declaration alone does not establish it.
+
+## SOLID as reasoning for reviewers
+
+| Principle | Reasoning and review question | Boundary against unnecessary structure |
+|---|---|---|
+| Single responsibility | Group behavior around a coherent responsibility and reason to change. Can the reviewer locate the owner of a policy without reconstructing several unrelated concerns? | Responsibility does not mean one method; do not create a class for every step. |
+| Open/closed | Where supported variation exists, isolate it so adding an implementation does not repeatedly disturb stable policy. What actual variation does this boundary accommodate? | Do not introduce extension points for hypothetical requirements or avoid necessary changes to an existing contract. |
+| Liskov substitution | Implementations must honor the contract callers rely on: accepted inputs, results, failures, mutation, and lifecycle behavior. Can a caller use each implementation under the same promised conditions? | Shared signatures alone do not establish substitutability. Do not strengthen preconditions or weaken guarantees relative to the supported contract. |
+| Interface segregation | Give consumers operations they meaningfully need. Can a reviewer understand the dependency without learning unrelated capabilities? | Split interfaces when consumer roles differ, not mechanically into one-method interfaces. |
+| Dependency inversion | Keep domain policy independent of incidental infrastructure where that boundary matters. Does the dependency express the consumer's needs, and can the reviewer see which policy depends on which mechanism? | Dependency injection does not require a container or an interface for every class. Retain concrete dependencies where another abstraction adds no useful boundary. |
+
+Prefer composition when behavior must vary independently or inheritance cannot preserve the parent contract. Use inheritance when the subtype relationship and supported extension contract are real. A straightforward function or concrete class remains appropriate when additional structure would add navigation without protecting a meaningful boundary.
+
+For consequential structural changes, identify what is promised, who guarantees it, and how callers rely on it. Justify an abstraction by the concrete uncertainty, coupling, or repeated change it removes. These criteria guide the requested implementation; they do not authorize architectural rewrites or turn preferences into mandatory findings. Apply the evidence threshold below.
 
 ## Pattern selection
 
