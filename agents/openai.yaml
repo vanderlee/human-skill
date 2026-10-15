@@ -1,0 +1,6 @@
+interface:
+  display_name: "Human"
+  short_description: "Make AI code changes easier for humans to review"
+  default_prompt: "Use $human to make the requested code changes easy for a human to review, with clear code, a focused diff, and a concise evidence-backed handoff."
+policy:
+  allow_implicit_invocation: true
