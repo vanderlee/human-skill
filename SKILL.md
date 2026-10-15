@@ -5,164 +5,103 @@ description: Make code changes easier for humans to understand and review. Use d
 
 # Code humans can review
 
-Make code review after AI changes easier on humans. Produce code and a change explanation that let a reviewer understand the purpose, follow the implementation, identify consequential differences, and assess the evidence without reconstructing the AI's work. Readable code supports that goal; keep improvements proportionate to the requested task.
+Produce code and explanations that let a reviewer understand the purpose, follow consequential behavior, and assess evidence without reconstructing the conversation. Keep improvements proportionate to the requested task.
 
-For review requests, do not edit files. Lead with actionable findings, their locations, concrete consequences, and suggested remedies. Label demonstrated defects, contract violations, and applicable mandatory-rule violations **Required**; label preferences and readability improvements **Optional**. Use **FYI** only for useful context that requests no change. Prioritize by impact, distinguish pre-existing findings from introduced ones, and do not invent findings to fill a list.
+## Scope and review mode
 
-Discuss observable code behavior and consequences without attributing competence or motives. When a missing requirement determines whether something is defective, identify that uncertainty and seek the relevant contract before presenting a required fix. Keep demonstrated defects direct and actionable.
+Read repository instructions, relevant implementations, affected callers, and tests before changing code. Establish current contracts, supported versions, and local conventions. Verify old findings and roadmap claims against current code and maintained documentation. Roadmaps do not authorize future phases; respect explicit removals and compatibility decisions.
 
-## Keep communication easy to read
+Choose the smallest coherent change that resolves the task. Avoid unrelated cleanup, public API changes, formatting churn, and speculative features. Preserve existing user changes. Report an out-of-scope improvement only when its concrete benefit warrants attention.
 
-Apply these rules to chatbot conversations, code comments, documentation, review findings, handoffs, and other writing produced for the task. Respect explicit output requirements and established document formats.
+For review requests, report findings without editing files:
 
-- Use as few words as possible while preserving meaning, necessary evidence, and consequential limitations. Remove repetition, filler, and unnecessary background.
-- Use short sentences and familiar words. Prefer plain-language explanations over specialist vocabulary.
-- Match explanations to the reader's demonstrated knowledge and the task. Explain unfamiliar domain rules, local conventions, and specialist terms; omit basics already established in the conversation. When knowledge is uncertain, lead with the decision and provide supporting detail where needed. A brief parenthetical definition can help: "invariant (a rule that must always hold)."
-- Prefer bullet points for multiple facts, choices, findings, or steps. Keep each bullet focused. Use a short sentence for a single point rather than forcing it into a list.
-- Lead with the answer, outcome, or action. Add only the context needed to understand it or decide what to do next.
-- Keep technical names precise when needed to locate code or describe a contract. Do not shorten text by hiding important conditions, changing meaning, or replacing useful explanations with unexplained jargon.
-- In code documentation, explain non-obvious intent and constraints. When review uncovers an explanation future maintainers will need, preserve it in the appropriate code comment, test, or maintained documentation within scope. Do not leave essential understanding only in the conversation or add comments merely to restate clear code or define routine syntax.
+- Lead with actionable findings, locations, concrete consequences, and suggested remedies. Prioritize by impact and distinguish pre-existing issues from introduced ones. Do not invent findings to fill a list.
+- Label demonstrated defects, contract violations, and applicable mandatory-rule violations **Required**; label preferences and readability improvements **Optional**. Use **FYI** for useful context requesting no change.
+- Discuss behavior and consequences without attributing competence or motives. When a missing requirement determines whether something is defective, identify the uncertainty and seek the relevant contract before requiring a fix. Keep demonstrated defects direct.
 
-## Ground changes in the code
+## Communicate for the reader
 
-Read repository instructions, relevant implementations, callers, and tests. Identify the supported contracts and local conventions before changing structure. Use current code and maintained documentation to verify old reviews or roadmap claims.
+Apply this guidance to conversation, comments, documentation, review findings, and handoffs. Respect explicit output requirements and established formats.
 
-Treat architectural roadmaps as context, not authorization for later phases. Check current implementation and phase status, and respect explicit removal decisions rather than reintroducing superseded APIs or compatibility paths during cleanup.
+- Lead with the answer, outcome, or action. Use short sentences, familiar words, and only the context needed to understand or decide. Remove repetition and filler without losing conditions, evidence, or material limitations.
+- Match explanations to demonstrated knowledge. Explain unfamiliar domain rules, local conventions, and specialist terms; omit basics already established. Keep technical names precise enough to locate code and describe contracts. When knowledge is uncertain, lead with the decision and add necessary supporting detail.
+- Use focused bullets for parallel facts, choices, findings, or steps; use a sentence for a single point.
+- Explain non-obvious intent, constraints, and surprising decisions rather than narrating syntax. Update misleading comments and obsolete active examples in affected code. When review uncovers understanding future maintainers need, preserve it in an appropriate comment, test, or maintained document within scope rather than only in conversation. Do not duplicate clear code.
 
-For changes to parsers, speculative execution, lazy or cached results, effect commits, or alternate execution entry points, read [references/execution-lifecycle.md](references/execution-lifecycle.md) when those contracts are affected. Ordinary changes do not require this reference.
+## Make intent and contracts visible
 
-## Make intent and responsibilities visible
+Judge readability by what a maintainer must remember, infer, and navigate to assess the changed rule, rather than by length or visual appeal. Apply these principles to requested work; they do not authorize nearby cleanup.
 
-- Keep functions and classes centered on a coherent responsibility. Prefer an existing appropriate owner over a new layer.
-- Name operations and values using the domain and their actual meaning. Make units, consumption rules, ownership, and meaningful distinctions visible where ambiguity can cause mistakes. Follow established naming conventions.
-- Separate small groups of closely related statements with a single blank line. Keep each group focused on one local step, such as checking a precondition, preparing inputs, performing an operation, or constructing a result. Keep tightly related lines together; do not insert a blank line after every statement, split an expression, or add redundant blank lines immediately inside braces. Apply this grouping to code you edit and respect syntax and enforced repository formatting rules.
-- Make dependencies, state changes, and side effects visible. Restore temporary state on exceptions and early returns. Do not hide important behavior behind magic dispatch or implicit fallback.
-- Consolidate duplicated policy when the implementations have the same semantics and change together. Similar-looking code with different contracts need not share an abstraction. Avoid speculative interfaces, generic frameworks, and fixed size or complexity limits.
-- Preserve the affected contracts, state lifetime, and effect timing. Derive required boundaries from the project's behavior and documentation.
-- Follow language and repository conventions for imports and qualified names. In PHP, prefer imported short names for external classes, interfaces, traits, enums, functions, and constants, including global exception classes; use descriptive aliases for collisions. Preserve symbol resolution and dynamic lookup behavior. Do not add redundant imports for same-namespace symbols or built-in types, or rewrite literal identifiers required by external contracts. See [references/formatting.md](references/formatting.md) for details.
-- Use types to clarify contracts where the language and project support them. Keep validation and failure handling near the boundary that owns them; preserve useful error context.
-- Write names, comments, and durable explanations for a reader who did not see the conversation or intermediate AI revisions. Within the applicable file layout, make significant entry points easy to find and place detailed helpers after the operations they explain when that improves the reading route. Do not reorder declarations or initialization when order affects behavior.
-- Write comments for intent, constraints, and surprising decisions. When touching relevant code, remove misleading comments and narration that merely repeats the implementation. Explain why a special case exists rather than labeling it special.
+- Keep functions and classes centered on coherent responsibilities. Prefer an existing appropriate owner over a new layer. Keep validation and failure handling at the boundary that owns them, preserving useful error context.
+- Use consistent domain names. Expose units, defaults, ownership, consumption rules, and lifecycle preconditions where ambiguity matters. Use existing types and interfaces to clarify inputs, outputs, mutation, and failure behavior without wrapping every scalar or documenting every call.
+- Keep related decisions, data, and consequences close. Narrow temporary-state lifetimes and make dependencies, mutations, effect ordering, and cleanup on exceptions or early returns visible. Avoid magic dispatch or implicit fallback that hides consequential behavior.
+- Keep abstraction levels coherent. Let orchestration show meaningful steps; extract detailed mechanics when that reduces reconstruction work. Keep tightly coupled logic and important dependencies together; avoid trivial forwarding helpers, long parameter lists, and extraction merely to shorten methods.
+- Consolidate policy only when semantics match and implementations must change together. Similar-looking branches with different contracts may remain separate. Use predictable vocabulary and ordering while exposing meaningful differences.
+- Reduce unnecessary state combinations when contracts permit. Before removing derivable state, establish whether it is an intentional snapshot, cache, retained failure, or other lifetime distinction. Preserve legitimate states and transitions; do not introduce speculative types.
+- Make conditions, defaults, failure paths, and state lifetime explicit. Prefer a clearer existing interface over ambiguous Boolean arguments, double negatives, or hidden mutation.
+- Write durable explanations for readers who did not see the conversation. Make significant entry points easy to find and place detailed helpers after the operations they explain when useful and compatible with file conventions. Preserve declaration and initialization order when behavior depends on it.
 
-## Refactor methods touched by the task
+Group closely related statements with a single blank line within the project's formatting rules. Keep each group focused on one local step. Do not separate every statement, split expressions, or add redundant blank lines immediately inside braces.
 
-Before editing a function or method, read enough of its body and affected callers to understand the requested change and its contracts. Investigate mixed responsibilities, nesting, repeated policy, or state when they obstruct implementing or verifying that change.
+For affected parser phases, speculative execution, lazy or cached results, effect commits, or alternate execution entry points, read [references/execution-lifecycle.md](references/execution-lifecycle.md). Apply only the relevant contracts and checks.
 
-Refactor touched code only when its existing structure creates a concrete obstacle to implementing or verifying the requested change. Identify that obstacle and make the smallest coherent refactor that removes it; readability improvement alone does not justify cleanup. This task-driven refactor does not require a separate request. Preserve public contracts, evaluation order, side effects, error handling, and resource lifetime. Keep supporting caller and test changes limited to what the requested change needs. If a broader rewrite is necessary, explain the concrete dependency rather than substituting optional cleanup for the requested work. Respect explicit user constraints.
+## Refactor only to serve the task
 
-Method length, nesting, and existing complexity alone do not trigger refactoring or a cleanup review. Leave unrelated complexity unchanged; report an optional follow-up only when its concrete benefit warrants the reviewer's attention.
+Before editing a function, read its body and affected callers sufficiently to understand its contracts. Refactor existing structure only when it creates a concrete obstacle to implementing or verifying the requested change, or when refactoring is itself requested. Identify the obstacle and make the smallest coherent refactor that removes it. Task-driven refactoring needs no separate request; respect explicit user constraints.
 
-Within an authorized task-driven refactor, simplify branches, calculations, state, or indirection only as needed to remove the identified obstacle. Extract meaningful operations when they serve that purpose, keeping orchestration and consequential effect ordering visible. Keep tightly coupled logic together; avoid trivial forwarding helpers, long parameter lists, and abstractions introduced only to shorten a method.
+Length, nesting, or complexity alone does not trigger cleanup. Keep supporting caller and test changes limited to the task. If a broader rewrite is necessary, explain the concrete dependency. Leave unrelated complexity unchanged without a defensive explanation.
 
-Before handoff, inspect any refactored orchestration and extracted helpers to confirm that the identified obstacle is resolved and behavior is preserved using the checks below. Remaining unrelated complexity needs neither cleanup nor a defensive explanation.
+Preserve public contracts, evaluation and effect order, errors, outputs, cleanup, and resource/state lifetime during readability refactors. For intended behavior changes, update affected callers, tests, and documentation together. Before handoff, confirm that refactored orchestration and helpers resolve the identified obstacle and preserve the required behavior.
 
-For review-only tasks, report suggested refactors without editing.
+## Apply design criteria
 
-## Enforce formatting standards
+For structural edits and reviews, read [references/design-patterns.md](references/design-patterns.md) and assess the affected code against its contract, OOP, SOLID, and pattern-selection criteria. Keep objects responsible for their invariants, dependencies visible, and state ownership distinct from use. Express contracts through appropriate types, implementation, tests, or documentation without duplicating every contract in every form.
 
-Formatting is required for new and changed code, not optional polishing. Identify the applicable repository instructions, documented coding standard, formatter/linter configuration, EditorConfig, CI commands, and tool versions before editing. Apply the project's established standard consistently; do not substitute personal taste or a different language's conventions. When no standard is defined, use the recognized language-specific baseline in [references/formatting.md](references/formatting.md) and state the chosen default when it materially affects the diff.
+Choose an established pattern only when it solves the present problem and improves comprehension, invariants, or change isolation. Reuse a suitable existing mechanism; a direct function or cohesive class remains valid. Justify new abstractions by actual uncertainty, coupling, or repeated change they remove, rather than principle names or hypothetical flexibility.
 
-Follow the project's pinned standard, including an intentionally older one. Discuss migration only when requested or necessary for the task. With no declared PHP standard, use the PHP-FIG PER baseline in the reference, retaining PSR-1 foundations and supported syntax. Distinguish syntax specifications from formatting conventions and claim only the compliance actually checked.
+Require concrete harm in affected behavior or maintenance, or an explicit applicable project/user prohibition, before treating a design concern as mandatory. Respect established framework conventions unless that threshold is met. Correct demonstrated in-scope violations; report broader unresolved issues with concrete impact. Preferences do not authorize architectural cleanup, and renaming a concern as a pattern does not resolve it.
 
-After code changes, run the repository's documented formatter and relevant check mode or formatting linter for affected files or supported changed-line scope, using its pinned version and configuration. Prefer the canonical project CLI or wrapper command used by CI. Inspect IDE settings only when repository instructions delegate formatting authority to them; a successful canonical project check needs no separate proof of IDE equivalence. Fix violations introduced by your change. Preserve existing user changes and inspect the formatter's diff for unrelated rewrites. Make necessary whole-file formatting separately identifiable when it obscures behavioral edits; do not run a repository-wide formatter unless that is part of the task.
+For structural findings, propose a specific remedy and its owner, such as consolidating policy, moving a concern, simplifying a condition, or removing a wrapper. Explain the mental work or coupling it removes. For consequential structural changes, explain the affected contract, its invariant owner, callers' dependencies, and any non-obvious pattern tradeoff. Scale this to the change; it is an agent assessment, not an automated gate or mandatory handoff checklist.
 
-Check compound statements and dense expressions in new and changed code. Put control-flow bodies and separate executable statements on separate lines; wrap long chained calls, ternaries, and argument lists across multiple lines at meaningful boundaries according to the configured style.
+## Enforce formatting
 
-Follow project formatting for logical expressions. When layout is discretionary, prefer multiline layout for complex conditions and explicit grouping for mixed operators. Short, clear expressions may remain compact. Preserve operand order, parentheses, precedence, short-circuit behavior, and returned values; do not hoist effectful operands or introduce eager evaluation. Use enclosing parentheses where required for safe multiline syntax.
+Formatting is required for new and changed code. Identify applicable repository instructions, coding standards, EditorConfig, formatter/linter configuration, CI commands, and pinned versions before editing. Follow that standard, including an intentionally older one. Discuss migration only when requested or necessary.
 
-```php
-if (
-    (
-        $isReady
-        && $hasPermission
-    )
-    || $isAdministrator
-) {
-    execute();
-}
-```
+Read [references/formatting.md](references/formatting.md) when selecting a baseline, changing imports, or resolving formatting/compliance questions. With no declared standard, use its language-specific default and state the choice when material to the diff. For PHP, use its PHP-FIG PER baseline with PSR-1 foundations and supported syntax. Prefer imported short names for external PHP symbols, including global exceptions, with descriptive aliases for collisions; preserve symbol resolution and literal identifiers required by external contracts.
 
-The configured project formatter takes precedence over discretionary layout preferences in this skill. Do not change shared configuration or add suppression directives to enforce a preference.
+- Follow project layout for control flow and expressions. Put control-flow bodies and separate executable statements on separate lines; wrap dense chains, ternaries, and argument lists at meaningful boundaries. Where discretionary, use multiline complex conditions and explicit grouping for mixed operators; compact clear expressions may remain.
+- Preserve precedence, operand order, short-circuit behavior, return values, import execution order, strings, fixtures, and generated-file ownership. Do not hoist effectful operands or make evaluation eager for presentation.
+- After final edits, run the canonical project formatter and relevant check mode or formatting linter for affected files or supported changed-line scope, with pinned configuration/version. Fix introduced violations and inspect its diff for unrelated rewrites. Keep necessary whole-file formatting distinguishable; repository-wide formatting requires task scope.
+- The project formatter overrides discretionary preferences here. Do not change configuration, add suppressions, or use formatter-ignore directives merely to enforce or bypass a preference. Inspect IDE settings only when the repository delegates authority to them; a canonical check needs no separate IDE proof.
+- If authoritative tooling is unavailable, inspect manually and report unavailable automated verification. Do not silently install tools or claim a gate passed. Resolve documented/configured disagreements from actual conventions and report unresolved conflicts rather than toggling formats. Syntax and behavioral tests do not establish formatting compliance.
 
-Use blank lines to group closely related statements within the applicable standard's rules. Do not use formatter-ignore directives, lint suppression, or configuration changes merely to bypass formatting requirements. Preserve semantics, including import execution order, string contents, fixtures, and generated files. Review-only tasks report violations without formatting files.
+## Verify behavior and reviewability
 
-If the authoritative formatter or check is unavailable, inspect affected code manually against the selected standard and report the unavailable automated verification. An unavailable IDE is not a verification gap when the canonical project check ran successfully. Do not silently install tools, change the standard, or claim a formatting gate passed. When documented rules and enforced configuration disagree, inspect the project's actual conventions and report unresolved conflicts rather than toggling formats repeatedly.
+Treat names, comments, proposed fixes, and prior reviews as hypotheses. Seek counterexamples to changed assumptions and trace consequential success, failure, and boundary paths from callers. Check inputs, results, ordering, and effects against current contracts. Verify new APIs, signatures, configuration keys, and dependencies against actual project versions.
 
-## Enforce design choices
+Select checks from repository instructions and affected behavior. Add or adjust tests when behavior, contracts, or meaningful regression risk warrants them; avoid tests that merely mirror implementation, helper names, or layout. Derive expectations from the intended contract, independent examples, or known regressions. Use domain vocabulary and make triggering conditions, consequential setup, and expected outcomes clear; retain shared fixtures when they help comprehension. Small naming/comment changes may need only inspection or an existing syntax check.
 
-Use contracts and object boundaries to reduce reviewer uncertainty. Make affected inputs, results, failure behavior, state changes, and lifecycle constraints explicit through the project's types, interfaces, implementation, tests, and documentation without duplicating every contract in every form. Keep objects responsible for protecting their invariants, dependencies visible, and state ownership distinct from use.
+Make important claims inexpensive to verify: connect the changed rule to implementation and tests/checks, using concrete inputs and expected outcomes when useful. State what ran, what was observed, what coverage is inferred, and material assumptions or untested behavior. Attractive code, fluent explanations, and a passing suite do not prove every claim. Do not imply unperformed checks, CI, or independent review.
 
-Apply basic OOP and SOLID through their reasoning: coherent responsibilities, justified extension boundaries, substitutable implementations, consumer-focused interfaces, and separation of policy from infrastructure. Use the detailed criteria in [references/design-patterns.md](references/design-patterns.md) for affected structural work. Principle names alone do not justify an abstraction or a finding, and these preferences do not expand the task-driven refactoring scope.
+During your own review, check whether a reviewer can locate the rule, predict a representative result, understand a relevant boundary/failure case, and find evidence. Resolve task-relevant missing causal links, unnecessary navigation, hidden state, and assumptions. Do not quiz the user or require lengthy explanations.
 
-Use an established design pattern when the requested change presents the problem that pattern solves and the pattern improves comprehension, invariants, or change isolation. Reuse a suitable existing pattern rather than introducing a parallel mechanism. A direct function or cohesive class remains valid when no pattern adds value; do not introduce a pattern merely to satisfy a naming or architecture checklist.
+Inspect the final diff against the starting state or appropriate review base. Distinguish existing user work from your edits. Check for unintended changes, stale comments, weakened assertions, noise, unrelated dependencies, and behavioral differences hidden among moves or formatting. Remove accidental artifacts; report an unavailable review base or verification instead of claiming completion of those checks.
 
-For structural edits and reviews, read [references/design-patterns.md](references/design-patterns.md) and apply its selection criteria. Treat a design concern as a mandatory violation only when concrete evidence demonstrates harm in the affected behavior or maintenance task, or an explicit applicable project or user rule prohibits it. A pattern label or this skill's preference alone is insufficient. Respect established framework integration conventions unless that evidence or prohibition applies. Correct demonstrated in-scope violations while preserving contracts; otherwise report the concrete impact and smallest coherent follow-up. Keep unsupported design preferences optional. Do not silently expand the assignment or conceal an unresolved violation by renaming it as a pattern.
+When interrupted or handing work over, retain relevant locations, unresolved assumptions, completed checks, and the next step in existing task context. Do not scatter temporary notes through the repository.
 
-Before completing a structural change, assess the affected code against these rules. Explain a new non-obvious pattern in terms of the concrete problem, responsibilities, and tradeoff. For reviews, substantiate violations with observable coupling, state, duplication, or failure behavior, rather than labels or size alone. These are agent review requirements, not an automated static-analysis gate.
+Optional research: consult relevant decisions in [references/cognition-evidence.md](references/cognition-evidence.md) for maintenance and [references/review-cognition.md](references/review-cognition.md) for review. These references add no mandatory checks or cleanup; their applications do not establish universal cognitive limits.
 
-For a consequential structural change, explain the affected contract, the owner of its invariants, and how callers depend on it. Justify a new abstraction by the concrete uncertainty, coupling, or repeated change it removes. Assess violations through observable consequences or explicit project requirements; keep design preferences optional. Scale this explanation to the change rather than adding a separate checklist to every handoff.
+## Keep the diff and handoff reviewable
 
-## Reduce cognitive load and check assumptions
+Give each increment one coherent purpose. Preserve recognizable names, order, and layout where they work. Keep necessary mechanical moves, renames, and formatting distinguishable from logic changes; use separate logical groups or commits/PRs only when warranted. Keep cross-file contract changes coherent rather than splitting them into invalid intermediate states. Check callers and references before removing a surface, and explain significant responsibility moves.
 
-Judge readability by what an unfamiliar maintainer must remember, infer, and navigate to assess the change, rather than by code length alone. Ask what the reviewer must keep in their head to judge each changed rule.
+Base the handoff on final code and diff. A small edit may need one sentence and validation. For substantial work, follow the project's template or give a compact, self-contained brief covering:
 
-Apply these principles when writing the requested change. Refactor existing code only under the task-driven rules above, including when its structure creates a concrete obstacle to verifying the change. These principles do not authorize cleanup of nearby code merely because it could be clearer.
+- **Purpose:** the problem, accepted scope, and why this change addresses it.
+- **Behavior:** concrete before/after results, consequential contract differences, assumptions, and structural moves.
+- **Review route:** entry point, important logic/contract, and relevant tests, with current file/symbol links. Highlight decisions needing human attention and identify review boundaries.
+- **Evidence:** checks and relevant coverage, including formatting results, remaining uncertainty, and unresolved issues.
 
-- Keep related decisions and data close, narrow temporary-state lifetimes, and use consistent domain vocabulary. Expose units, defaults, consumption rules, and lifecycle preconditions where ambiguity matters.
-- Judge extraction by its net effect on comprehension using the refactoring rules above. Readers should understand meaningful operations without navigating between trivial helpers.
-- Keep a decision and its consequences close: the condition, the action it permits, and relevant failure handling should be understandable together. Extract detailed mechanics when useful, while keeping consequential control flow and dependencies visible.
-- Make local contracts visible at call sites. Names and types should communicate inputs, outputs, mutation, and failure behavior where practical. Explain non-obvious behavior that the interface cannot reasonably communicate; do not narrate every call.
-- Reduce unnecessary state combinations. Prefer values that become valid once and remain valid over repeated reassignment or coordinated flags when this preserves the contract. Make possible states and transitions apparent without erasing legitimate lifecycle distinctions or introducing speculative types.
-- Keep abstraction levels consistent. Let orchestration describe meaningful steps; separate low-level parsing, indexing, or transport mechanics when doing so clarifies the changed rule. Keep details inline when extraction would hide an important dependency.
-- Make related branches predictable through consistent vocabulary and ordering. Expose meaningful differences explicitly so similar appearance does not conceal different behavior. Do not consolidate branches merely because they look alike.
-- Make consequential differences visible: conditions, defaults, ordering, failure paths, and state lifetime. Avoid ambiguous Boolean arguments, double negatives, and hidden mutations where a clearer existing interface is available.
-- Treat names, comments, old reviews, and proposed fixes as hypotheses. Seek a counterexample to changed assumptions and trace representative consequential success and failure paths from the caller. Check inputs, outputs, ordering, and effects against the contract.
-- Treat attractive code and fluent explanations as presentation, not evidence of correctness. Update obsolete active comments and examples within scope; distinguish completed, cancelled, and pending work.
-- When work spans interruptions or handoffs, retain relevant locations, unresolved assumptions, completed checks, and the next step in existing task context. Do not scatter temporary notes through the repository.
+Use accurate base/head commits when they capture the work; otherwise identify the starting snapshot and owned changes. Describe scope and risk through concrete behavior and dependencies, avoiding unsupported labels such as "trivial," "obvious," or "too complex."
 
-For each consequential change, check whether a reviewer can locate the changed rule, predict an observable result for a representative input, understand a relevant boundary or failure case, and find evidence for its behavior. Resolve missing causal links using code and evidence; address task-relevant navigation, hidden state, or implicit assumptions within scope. Apply this during your own review, without requiring a user quiz or a lengthy explanation.
-
-Optional evidence is organized by decision: [references/cognition-evidence.md](references/cognition-evidence.md) covers maintenance choices, and [references/review-cognition.md](references/review-cognition.md) covers review choices. Consult only relevant findings when evaluating or explaining a recommendation. These references add no mandatory checks or cleanup requirements, and their engineering applications are not universal cognitive limits.
-
-## Keep changes reviewable
-
-- Give each reviewable increment one coherent purpose. Keep incidental cleanup, formatting, and mechanical moves separately identifiable from behavioral changes; use logical groups or separate commits/PRs only when the task and workflow warrant them. Keep a necessary cross-file contract change together rather than fragmenting it into invalid intermediate states.
-- Preserve observable behavior during readability refactors, including errors, ordering, outputs, and state lifetime. For intended changes, explain a concrete trigger and before/after behavior; update affected callers, tests, and documentation together. Compatibility requirements come from the project and user.
-- Choose the smallest coherent change that resolves the problem. Avoid unrelated formatting churn, opportunistic public API changes, and future roadmap features. Flag improvements outside scope without adding them silently.
-- Preserve recognizable structure where it still works: existing names, declaration order, and layout help reviewers compare behavior. Avoid combining a behavioral change with unnecessary renaming, moves, and formatting of the same code. Keep necessary mechanical edits distinguishable so reviewers need not mentally reverse them to find the changed rule.
-- Creating, splitting, merging, moving, or deleting classes/files is allowed when justified by the task. Explain where important responsibilities moved and distinguish moved or renamed code from changed logic. Check callers and references before removing an existing surface.
-- Make review-sensitive differences explicit: conditions, defaults, operation order, failure/recovery behavior, state and resource lifetime, dependencies, and public contracts. Call out consequential decisions and assumptions rather than inventorying every edit.
-
-
-For structural findings, propose a concrete remedy and its owner: consolidate genuinely duplicated policy, move a concern to its owning module, simplify a condition, extract a meaningful operation, make an invariant explicit, or remove a redundant wrapper. Explain what mental work or coupling the remedy removes; do not merely label code complex or prescribe a pattern. Remove derivable duplicate state only after checking whether it represents a snapshot, cache, retained failure, or other intentional lifetime distinction.
-
-## Verify the change and its evidence
-
-Select existing checks from repository instructions and affected behavior. Add or adjust tests when behavior, contracts, or a meaningful regression risk warrants them; do not add tests that merely mirror code layout, helper names, or the generated implementation. Derive expected outcomes from the intended contract, an independent example, or a known regression.
-
-When writing or changing tests, use the reviewer's domain vocabulary. Make the triggering condition and expected outcome clear in names and assertions. Prefer concrete examples and expose consequential setup rather than making reviewers trace elaborate fixture builders to understand the changed rule; retain shared fixtures when they improve comprehension.
-
-For structural refactors, verify representative success, failure, and boundary behavior and relevant state/effect timing. Select specialized execution and lifecycle checks from the conditional reference when applicable. Verify that newly used APIs, signatures, configuration keys, and dependencies exist in the project's actual versions rather than accepting plausible generated names. For a small naming or comment edit, proportionate inspection or an existing syntax check may suffice.
-
-Make important behavior claims inexpensive to check: link the changed rule to the relevant implementation and tests or checks, and give a concrete input and expected outcome when that clarifies behavior. State what was actually run, distinguish observed results from inferred coverage, and identify material assumptions or untested behavior. A passing suite alone is not proof of every behavior-preservation claim. Do not imply that a check, independent review, or CI matrix ran when it did not.
-
-Before handing over implementation work, check affected code against the refactoring and formatting rules above. Confirm whether the authoritative project formatter/check ran after the final code edits, and report unavailable verification.
-
-Before handing over implementation work, inspect the actual final diff against the task's starting state or appropriate review base. Separate existing user changes from your changes; preserve user work. Check for unintended edits, stale comments, weakened or removed assertions, generated noise, unrelated dependencies, and behavior changes hidden among moves or formatting. Remove your accidental artifacts. If the review base or a check is unavailable, state that limitation instead of claiming complete verification.
-
-## Hand off for human review
-
-Lead with the concrete outcome and explain the reason for the change. For substantial work, provide a short reading route through the entry point, important logic or contract, and relevant tests, using current file/symbol links. Identify the decisions that deserve human attention and map significant structural moves. Base this explanation on the final diff and code, not the abandoned plan or intermediate tool activity.
-
-Describe review scope and risk through concrete behavior and dependencies. Avoid unsupported difficulty labels such as "trivial," "obvious," or "too complex." Explain what deserves attention and why.
-
-When handing work to a reviewer, provide a self-contained brief: the requirements or accepted scope, the final change summary, the relevant contract and evidence, and explicit review boundaries. Use base/head commits when they accurately identify the work; for a dirty working tree, identify the starting snapshot and owned changes instead of pretending a commit range captures them. Provide enough context to assess the artifact without sending the full session history. Independent review is useful when warranted and authorized; it is not mandatory delegation.
-
-Scale the handoff to complexity. A small edit may need one sentence and its validation; a substantial change can use these four compact parts, following an existing PR template where applicable:
-
-- **Purpose:** the problem and why this change addresses it.
-- **Behavior:** the before/after result, important contract differences, and structural moves where relevant.
-- **Review route:** where to start, followed by the consequential logic and its tests; omit for a trivial change.
-- **Evidence:** checks run and relevant coverage, plus remaining uncertainty or unresolved issues.
-
-Do not overwhelm the reviewer with a chronological work log, an exhaustive file inventory, repeated checklist boilerplate, or unsupported confidence labels. Keep durable rationale in the appropriate code or maintained documentation and the change-specific explanation in the handoff. Producing a handoff does not authorize publishing a PR or sending messages to others.
+Keep durable rationale in code or maintained documentation and change-specific explanation in the handoff. Omit chronological logs, exhaustive inventories, repeated checklist boilerplate, and unsupported confidence labels. Independent review is useful when warranted and authorized; this skill does not require delegation or authorize publishing PRs or messaging others.
