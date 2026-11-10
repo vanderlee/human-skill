@@ -28,6 +28,10 @@ Apply this guidance to conversation, comments, documentation, review findings, a
 - Use focused bullets for parallel facts, choices, findings, or steps; use a sentence for a single point.
 - Explain non-obvious intent, constraints, and surprising decisions rather than narrating syntax. Update misleading comments and obsolete active examples in affected code. When review uncovers understanding future maintainers need, preserve it in an appropriate comment, test, or maintained document within scope rather than only in conversation. Do not duplicate clear code.
 
+## Balance AI implementation and human review
+
+When generating or changing code with an AI agent, read [references/ai-human-balance.md](references/ai-human-balance.md). Optimize correctness, explicit yet economical contracts, local comprehensibility, and review effort together. Do not optimize token count or generation speed at the expense of maintainability; preserve established conventions and scope.
+
 ## Make intent and contracts visible
 
 Judge readability by what a maintainer must remember, infer, and navigate to assess the changed rule, rather than by length or visual appeal. Apply these principles to requested work; they do not authorize nearby cleanup.
