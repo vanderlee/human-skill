@@ -32,6 +32,17 @@ Apply this guidance to conversation, comments, documentation, review findings, a
 
 When generating or changing code with an AI agent, read [references/ai-human-balance.md](references/ai-human-balance.md). Optimize correctness, explicit yet economical contracts, local comprehensibility, and review effort together. Do not optimize token count or generation speed at the expense of maintainability; preserve established conventions and scope.
 
+## Use meaningful names
+
+Always use meaningful names for every identifier you introduce or change: variables, constants, parameters, functions, methods, properties, fields, classes, traits, interfaces, types, enum members, modules, and other named elements. Names must express their role, domain meaning, or action; include units or ownership when these distinguish otherwise similar values.
+
+- Avoid opaque abbreviations, single-letter placeholders, generic catch-all names, and numbered variations that make readers reconstruct meaning from surrounding code. This includes loop indices, callbacks, reducers, temporary values, and dependency aliases. An established abbreviation is appropriate only when its meaning is clear to the intended maintainer.
+- Choose names from the actual behavior and data, after reading relevant definitions and callers. Keep related concepts consistent and distinguish different roles rather than assigning the same expanded name mechanically. Prefer precise, economical names over unnecessary length or repeated type information.
+- Correct unclear names in existing code within the task's scope. Preserve binding, evaluation order, and behavior; update affected callers, documentation, and tests together. Do not expand an unrelated task solely to rename code elsewhere.
+- Preserve spellings required by external APIs, serialized data, frameworks, generated code, or other compatibility contracts. Use descriptive internal names or aliases where those required spellings would otherwise obscure meaning; do not change a contract implicitly through shorthand properties or destructuring.
+
+Before handoff, review names as part of correctness and readability: a reader should be able to identify what each value represents and what each operation does without decoding an abbreviation or tracing unrelated code.
+
 ## Make intent and contracts visible
 
 Judge readability by what a maintainer must remember, infer, and navigate to assess the changed rule, rather than by length or visual appeal. Apply these principles to requested work; they do not authorize nearby cleanup.
